@@ -18,9 +18,9 @@ router.post("/", async (req, res) => {
     const username = req.body.username;
     const email = req.body.email;
     const password = req.body.password;
-    const genSalt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, genSalt);
     try {
+        const genSalt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, genSalt);
         const userExists = await UserModel.findOne({$or:[{email:email}, {username:username}]})
         if (userExists) {
             return res.status(409).json({message:"username or email already in db"})
