@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchUser } from '../slices/userSlice'
 
 const Login = () => {
     const [formData, setFormData] = useState({
         email: '',
         password: '',
     })
+    const dispatch = useDispatch()
+    const {user, loading:userLoading, error} = useSelector(state => state.user)
+    console.log(user, error, userLoading)
     const navigate = useNavigate()
     useEffect(() => {
-        const user = JSON.parse(localStorage.getItem('loggedIn'))
-        console.log(user)
-        if (user && user?.email.length > 0) {
+        if (user?.email && user?.email.length > 0) {
             navigate('../home', { replace: true })
         }
-    }, [navigate])
+    }, [navigate, user])
 
     const handleChange = (event) => {
         setFormData((prev) => ({
@@ -23,19 +26,7 @@ const Login = () => {
     }
     const handleSubmit = async (event) => {
         event.preventDefault()
-        const response = await fetch('http://localhost:5050/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData),
-        })
-        const user = await response.json()
-        if (response.ok) {
-            localStorage.setItem('loggedIn', JSON.stringify(user))
-            navigate('/home')
-        }
-        return user
+            dispatch(fetchUser(formData))
     }
     return (
         <div className="w-screen h-screen flex items-center justify-center">
